@@ -1,107 +1,127 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-int wordcount(char *filename);
-int charcount(char *filename);
+int wordcount(char *Filename);
+int charcount(char *Filename);
+//主函数入口 
+int main(int input0, char *input[]) {
 
-int main(int argc, char *argv[]) {
 
-	//第一个参数默认是可执行文件本身，第二个参数开始是接受到的参数
-
-	char filename[30];
-	char operation;
-	int toalchar;
-	int totalword;
-	if (!strcmp(argv[1], "-w")) {
-		wordcount(argv[2]);
-	} else if (!strcmp(argv[1], "-c")) {
-		charcount(argv[2]);
+	//char Filename[50];
+	//int totalchar = 0;
+	//int totalword = 0;
+	//如果输入信息中有提示词“-w”是要判断单词数时，将进入以下分支 
+	if (!strcmp(input[1], "-w"))
+	 {
+		wordcount(input[2]);
+	} 
+	//如果输入信息中有提示词“-c”是要判断字符数时，将进入以下分支 
+	else if (!strcmp(input[1], "-c"))
+	 {
+		charcount(input[2]);
+	}
+	//如果输入信息中没有相应提示字符时，则判定为输入错误，无法进行相关的计算 
+	else
+	{
+		printf("输入信息有错误，请重新输入:\n");
 	}
 	return 0;
 }
-
-int wordcount(char *filename) {
-	FILE *fp = NULL;
-	FILE *fp2 = NULL;
-	char buffer[1003];
-	int bufferLen;
-	int i;
-	char c;
-	int isLastBlank = 0;
+//计算单词数的函数 
+int wordcount(char *Filename) {
+	FILE *fp0 = NULL;       //定义文件类型的指针 
+	FILE *fp1 = NULL;
+	char buffer[2024];  	//定义缓冲暂存区 
+	int bufferlength = 0;      
+	int i = 0;
+	char c;                //定义变量存储得到的单词，用来判断是否已到达文档结尾 
+	bool isLastEnd = 0;
 	int totalword = 0;
-	int wordNum = 0;
-	if ( (fp = fopen(filename, "rb")) == NULL ) {
-		perror(filename);
+	int wordnum = 0;
+	if ( (fp0 = fopen(Filename, "rb")) == NULL ) {
+		//如果文件错误将输出打印相关的错误信息 
+		perror(Filename);
 		return NULL;
 	}
 
-	while (fgets(buffer, 1003, fp) != NULL) {
-		bufferLen = strlen(buffer);
+	while (fgets(buffer, 2024, fp0) != NULL)    //循环统计单词的个数 
+	{
+		bufferlength = strlen(buffer);
 
-		for (i = 0; i < bufferLen; i++) {
+		for (i = 0; i < bufferlength; i++) {
 			c = buffer[i];
 			if ( c == ' ' || c == '\t') {
-				!isLastBlank &&wordNum++;
-				isLastBlank = 1;
+				!isLastEnd &&wordnum++;
+				isLastEnd = true;
 			} else if (c != '\n' && c != '\r') {
 
-				isLastBlank = 0;
+				isLastEnd = false;
 			}
 		}
-		!isLastBlank &&wordNum++;
-		isLastBlank = 1;
-		totalword += wordNum;
-		wordNum = 0;
+		!isLastEnd &&wordnum++;
+		isLastEnd = true;
+		totalword += wordnum;
+		wordnum = 0;         //重置变量为零，以便下一次循环 
 	}
 	printf("单词数:%d ", totalword);
-	fp2 = fopen("result.txt", "a");
-	if (fp2) {
-		fprintf(fp2, "单词数:%d\n", totalword);
-		fclose(fp2);
+	fp1 = fopen("result.txt", "a");
+	if (fp1) {
+		fprintf(fp1, "单词数:%d\n", totalword);
+		fclose(fp1);
+	}
+	else
+	{
+		
 	}
 	return 0;
 }
 
+//计算字符数的函数 
+int charcount(char *Filename) {
 
-int charcount(char *filename) {
-
-	FILE *fp = NULL;
-	FILE *fp2 = NULL;
-	char buffer[1003];
-	int bufferLen;
-	int i;
-	char c;
-	int isLastBlank = 0;
+	FILE *fp0 = NULL;      //定义文件类型的指针
+	FILE *fp1 = NULL;
+	char buffer[2024];     //定义缓冲暂存区 
+	int bufferlength = 0;
+	int i = 0;
+	char c;                //定义变量存储得到的字符，用来判断是否已到达文档结尾 
+	bool isLastEnd = 0;
 	int totalchar = 0;
-	int charNum = 0;
-	if ( (fp = fopen(filename, "rb")) == NULL ) {
-		perror(filename);
+	int charnum = 0;
+	if ( (fp0 = fopen(Filename, "rb")) == NULL ) 
+	{
+		perror(Filename);
 		return NULL;
 	}
-	while (fgets(buffer, 1003, fp) != NULL) {
-		bufferLen = strlen(buffer);
-		for (i = 0; i < bufferLen; i++) {
+	while (fgets(buffer, 2024, fp0) != NULL)     //循环统计的字符数量 
+	{
+		bufferlength = strlen(buffer);
+		for (i = 0; i < bufferlength; i++) {
 			c = buffer[i];
 			if ( c == ' ' || c == '\t') {
-				isLastBlank = 1;
+				isLastEnd = true;
 			} else if (c != '\n' && c != '\r') {
-				charNum++;
-				isLastBlank = 0;
+				charnum++;
+				isLastEnd = false; 
 			}
 		}
 
-		isLastBlank = 1;
+		isLastEnd = true;
 
-		totalchar += charNum;
+		totalchar += charnum;
 
-		charNum = 0;
+		charnum = 0;               //重置变量为零，以便下一次循环 
 
 	}
 	printf("字符数:%d", totalchar);
-	fp2 = fopen("result.txt", "a");
-	if (fp2) {
-		fprintf(fp2, "字符数:%d\n", totalchar);
-		fclose(fp2);
+	fp1 = fopen("result.txt", "a");
+	if (fp1) 
+	{
+		fprintf(fp1, "字符数:%d\n", totalchar);
+		fclose(fp1);
 	}
+	else{
+		
+	} 
 	return 0;
 }
